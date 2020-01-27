@@ -30,13 +30,13 @@ func main() {
 	}
 
 	AccommodationsDocument = shimo.NewDocument(config.Documents.Accommodations, config.Cookie)
-	AccommodationsDocument.EliminateSuffix = "（"
+	AccommodationsDocument.Suffix = "（"
 
 	PlatformDocument = shimo.NewDocument(config.Documents.Platforms, config.Cookie)
-	PlatformDocument.EliminateSuffix = " ("
+	PlatformDocument.Suffix = " ("
 
 	e := echo.New()
-	e.GET("/accommodations", func(c echo.Context) error {
+	e.GET("/accommodations/json", func(c echo.Context) error {
 		message, err := AccommodationsDocument.GetJSON()
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -50,7 +50,16 @@ func main() {
 		return c.JSONBlob(http.StatusOK, marshalled)
 	})
 
-	e.GET("/platforms", func(c echo.Context) error {
+	e.GET("/accommodations/csv", func(c echo.Context) error {
+		csv, err := AccommodationsDocument.GetCSV()
+		if err != nil {
+			Log.Printf("failed to get document: %v", err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
+		}
+		return c.Blob(http.StatusOK, "text/csv", csv)
+	})
+
+	e.GET("/platforms/json", func(c echo.Context) error {
 		message, err := PlatformDocument.GetJSON()
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -62,6 +71,15 @@ func main() {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to marshal json")
 		}
 		return c.JSONBlob(http.StatusOK, marshalled)
+	})
+
+	e.GET("/platforms/csv", func(c echo.Context) error {
+		csv, err := PlatformDocument.GetCSV()
+		if err != nil {
+			Log.Printf("failed to get document: %v", err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
+		}
+		return c.Blob(http.StatusOK, "text/csv", csv)
 	})
 
 	Log.Fatal(e.Start(config.Server.Address))
