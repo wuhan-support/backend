@@ -30,7 +30,7 @@ func main() {
 	HotelDocument.EliminateSuffix = "（"
 
 	e := echo.New()
-	e.GET("/hotels", func(c echo.Context) error {
+	e.GET("/accommodations", func(c echo.Context) error {
 		message, err := HotelDocument.GetJSON()
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
