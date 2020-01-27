@@ -6,6 +6,7 @@ type Config struct {
 	} `yaml:"server"`
 	Cookie string `yaml:"cookie"`
 	Documents struct {
-		Hotel string `yaml:"hotel"`
+		Accommodations string `yaml:"accommodations"`
+		Platforms string `yaml:"platforms"`
 	} `yaml:"documents"`
 }

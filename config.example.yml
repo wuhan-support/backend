@@ -2,9 +2,10 @@
 server:
   address: :80
 
-# Shimo Cookie
+# EDIT ME: Shimo Cookie (get from https://shimo.im/ )
 cookie: foo=bar
 
 # Shimo Document ID
 documents:
-  hotel: xxx
+  accommodations: 6c6GKvX83hRCVdG8
+  platforms: kDQJ6vWgWWwq8r8H
