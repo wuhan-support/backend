@@ -1,0 +1,10 @@
+# HTTP Server
+server:
+  address: :80
+
+# Shimo Cookie
+cookie: foo=bar
+
+# Shimo Document ID
+documents:
+  hotel: xxx
