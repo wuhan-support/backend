@@ -1,9 +1,11 @@
 package main
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	"github.com/jinzhu/configor"
 	"github.com/labstack/echo"
 	"github.com/wuhan-support/shimo"
+	"gopkg.in/go-playground/validator.v9"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +17,17 @@ var (
 	AccommodationsDocument *shimo.Document
 	PlatformDocument       *shimo.Document
 )
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
+
+//func SimulateDelay(next echo.HandlerFunc) echo.HandlerFunc {
+//	return func(c echo.Context) error {
+//		time.Sleep(time.Millisecond * 500)
+//		return next(c)
+//	}
+//}
 
 func main() {
 	logFile, err := os.OpenFile("runtime.log", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
@@ -36,6 +49,11 @@ func main() {
 	PlatformDocument.Suffix = " ("
 
 	e := echo.New()
+	e.Debug = true
+	e.Validator = &CustomValidator{validator: validator.New()}
+
+	//e.Use(SimulateDelay)
+
 	e.GET("/accommodations/json", func(c echo.Context) error {
 		message, err := AccommodationsDocument.GetJSON()
 		if err != nil {
@@ -80,6 +98,15 @@ func main() {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
 		}
 		return c.Blob(http.StatusOK, "text/csv", csv)
+	})
+
+	e.POST("/report", func(c echo.Context) error {
+		var request ReportRequest
+		if c.Bind(&request) != nil && c.Validate(&request) != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "bad request")
+		}
+		Log.Printf("[report] new report record: %v", spew.Sdump(request))
+		return c.NoContent(http.StatusNoContent)
 	})
 
 	Log.Fatal(e.Start(config.Server.Address))
