@@ -3,3 +3,4 @@ config.yml
 .idea/
 logs/
 runtime.log
+vendor/
