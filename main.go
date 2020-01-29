@@ -4,7 +4,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/jinzhu/configor"
 	"github.com/labstack/echo"
-	"github.com/wuhan-support/shimo"
 	"github.com/wuhan-support/shimo-openapi"
 	"gopkg.in/go-playground/validator.v9"
 	"log"
@@ -16,8 +15,6 @@ import (
 var (
 	config                 Config
 	Log                    *log.Logger
-	AccommodationsDocument *shimo.Document
-	PlatformDocument       *shimo.Document
 )
 
 func (cv *CustomValidator) Validate(i interface{}) error {
@@ -44,27 +41,19 @@ func main() {
 		Log.Fatalf("failed to initialize config file: %v", err)
 	}
 
-	AccommodationsDocument = shimo.NewDocument(config.Documents.Accommodations, config.Cookie)
-	AccommodationsDocument.Suffix = "（"
-
-	PlatformDocument = shimo.NewDocument(config.Documents.Platforms, config.Cookie)
-	PlatformDocument.Suffix = " ("
-
 	e := echo.New()
-	e.Debug = true
+	e.Debug = false
 	e.Validator = &CustomValidator{validator: validator.New()}
 
 	//e.Use(SimulateDelay)
 
-
-	//  add by xiewei
 	shimoC := shimo_openapi.NewClient(config.Shimoauth.ClientId, config.Shimoauth.ClientSecret, config.Shimoauth.Username, config.Shimoauth.Password, config.Shimoauth.Scope)
 	Log.Println(config,shimoC)
 
 	//  返回住宿信息列表
-	e.GET("/api/accommodations", func(c echo.Context) error {
+	e.GET("/accommodations", func(c echo.Context) error {
 		fileId := "6c6GKvX83hRCVdG8"
-		opt := shimo_openapi.Opts{"工作表1",111,"P"}
+		opt := shimo_openapi.Opts{"工作表1",278, "P"}
 		message, err := shimoC.GetFileWithOpts(fileId,opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -74,9 +63,9 @@ func main() {
 	})
 
 	// 返回心理咨询机构列表
-	e.GET("/api/platforms/psychological", func(c echo.Context) error {
+	e.GET("/platforms/psychological", func(c echo.Context) error {
 		fileId := "Dpy6Q668cj3Xx8Rq"
-		opt := shimo_openapi.Opts{"工作表1",111,"O"}
+		opt := shimo_openapi.Opts{"工作表1",17, "O"}
 		message, err := shimoC.GetFileWithOpts(fileId,opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -86,63 +75,15 @@ func main() {
 	})
 
 	// 返回线上医疗平台列表
-	e.GET("/api/platforms/medical", func(c echo.Context) error {
+	e.GET("/platforms/medical", func(c echo.Context) error {
 		fileId := "kDQJ6vWgWWwq8r8H"
-		opt := shimo_openapi.Opts{"工作表1",111,"O"}
+		opt := shimo_openapi.Opts{"工作表1",23, "O"}
 		message, err := shimoC.GetFileWithOpts(fileId,opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
 		}
 		return c.JSONBlob(http.StatusOK, message)
-	})
-	//  add by xiewei
-
-
-	e.GET("/accommodations/json", func(c echo.Context) error {
-		message, err := AccommodationsDocument.GetJSON()
-		if err != nil {
-			Log.Printf("failed to get document: %v", err)
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
-		}
-		marshalled, err := message.MarshalJSON()
-		if err != nil {
-			Log.Printf("failed to marshal json: %v", err)
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to marshal json")
-		}
-		return c.JSONBlob(http.StatusOK, marshalled)
-	})
-
-	e.GET("/accommodations/csv", func(c echo.Context) error {
-		csv, err := AccommodationsDocument.GetCSV()
-		if err != nil {
-			Log.Printf("failed to get document: %v", err)
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
-		}
-		return c.Blob(http.StatusOK, "text/csv", csv)
-	})
-
-	e.GET("/platforms/json", func(c echo.Context) error {
-		message, err := PlatformDocument.GetJSON()
-		if err != nil {
-			Log.Printf("failed to get document: %v", err)
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
-		}
-		marshalled, err := message.MarshalJSON()
-		if err != nil {
-			Log.Printf("failed to marshal json: %v", err)
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to marshal json")
-		}
-		return c.JSONBlob(http.StatusOK, marshalled)
-	})
-
-	e.GET("/platforms/csv", func(c echo.Context) error {
-		csv, err := PlatformDocument.GetCSV()
-		if err != nil {
-			Log.Printf("failed to get document: %v", err)
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
-		}
-		return c.Blob(http.StatusOK, "text/csv", csv)
 	})
 
 	e.POST("/report", func(c echo.Context) error {
