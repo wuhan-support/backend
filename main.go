@@ -89,7 +89,7 @@ func main() {
 	// 返回医院需求列表
 	e.GET("/hospital/supplies", func(c echo.Context) error {
 		fileId := "zN32MwmPjmCLF0Av"
-		opt := shimo_openapi.Opts{"已合成",50, "AK", " "}
+		opt := shimo_openapi.Opts{"已合成",15, "AP", " "}
 		message, err := shimoC.GetFileWithOpts(fileId,opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
