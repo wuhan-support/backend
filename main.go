@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 
@@ -53,7 +54,7 @@ func main() {
 	// 返回住宿信息列表
 	e.GET("/accommodations", func(c echo.Context) error {
 		fileId := "6c6GKvX83hRCVdG8"
-		opt := shimo_openapi.Opts{"工作表1",278, "P", "（"}
+		opt := shimo_openapi.Opts{"工作表1",278, "P", "（", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId,opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -65,7 +66,7 @@ func main() {
 	// 返回心理咨询机构列表
 	e.GET("/platforms/psychological", func(c echo.Context) error {
 		fileId := "Dpy6Q668cj3Xx8Rq"
-		opt := shimo_openapi.Opts{"工作表1",17, "O", "\n"}
+		opt := shimo_openapi.Opts{"工作表1",17, "O", "\n", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId,opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -77,7 +78,7 @@ func main() {
 	// 返回线上医疗平台列表
 	e.GET("/platforms/medical", func(c echo.Context) error {
 		fileId := "kDQJ6vWgWWwq8r8H"
-		opt := shimo_openapi.Opts{"工作表1",23, "O", " ("}
+		opt := shimo_openapi.Opts{"工作表1",23, "O", " (", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId,opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -89,7 +90,7 @@ func main() {
 	// 返回医院需求列表
 	e.GET("/hospital/supplies", func(c echo.Context) error {
 		fileId := "zN32MwmPjmCLF0Av"
-		opt := shimo_openapi.Opts{"已合成",160, "AP", " "}
+		opt := shimo_openapi.Opts{"已合成",160, "AP", " ", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId,opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)

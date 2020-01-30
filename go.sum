@@ -48,6 +48,8 @@ github.com/wuhan-support/shimo-openapi v0.0.0-20200129175013-672e6c22aa80 h1:uWt
 github.com/wuhan-support/shimo-openapi v0.0.0-20200129175013-672e6c22aa80/go.mod h1:hIF1+1hy0sDCiVNfM0L/azF8DyvDIzzwlIMMzmGBY6E=
 github.com/wuhan-support/shimo-openapi v0.0.0-20200129221720-1bc2651a81d5 h1:JMuj9Yqhyh8IfPUYNmfT3D6DFwKdo6ETf/aLo2OOpTg=
 github.com/wuhan-support/shimo-openapi v0.0.0-20200129221720-1bc2651a81d5/go.mod h1:hIF1+1hy0sDCiVNfM0L/azF8DyvDIzzwlIMMzmGBY6E=
+github.com/wuhan-support/shimo-openapi v0.0.0-20200130045624-64e1a9572f2f h1:TWzFnh6jvfq6vokiVl7dM2sWtGypu78OEGczaBB3wBQ=
+github.com/wuhan-support/shimo-openapi v0.0.0-20200130045624-64e1a9572f2f/go.mod h1:hIF1+1hy0sDCiVNfM0L/azF8DyvDIzzwlIMMzmGBY6E=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d h1:9FCpayM9Egr1baVnV1SX0H87m+XB0B8S0hAMi99X/3U=
 golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
