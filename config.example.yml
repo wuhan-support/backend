@@ -9,3 +9,11 @@ shimoauth:
   username: kDQJ6vWgWWwq8r8H@gmail.com
   password: kDQJ6vWgWWwq8r8H
   scope: read
+
+dbinfo:
+  dbname: "whsupport"
+  addr: "127.0.0.1:3306"
+  user: "root"
+  pwd: "123456"
+
+uploadPath: "./upload"
