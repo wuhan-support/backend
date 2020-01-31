@@ -12,7 +12,7 @@ shimoauth:
 
 dbinfo:
   dbname: "whsupport"
-  addr: "127.0.0.1:3306"
+  addr: "172.16.238.4:3306"
   user: "root"
   pwd: "123456"
 
