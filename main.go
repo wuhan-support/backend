@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/biezhi/gorm-paginator/pagination"
 	"io"
 	"log"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 	"github.com/jinzhu/configor"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/labstack/echo"
 	shimo_openapi "github.com/wuhan-support/shimo-openapi"
 	"gopkg.in/go-playground/validator.v9"
@@ -22,7 +24,7 @@ import (
 var (
 	config Config
 	Log    *log.Logger
-	dbConn *gorm.DB
+	db     *gorm.DB
 )
 
 func (cv *CustomValidator) Validate(i interface{}) error {
@@ -42,16 +44,17 @@ func init() {
 		Log.Fatalf("failed to initialize config file: %v", err)
 	}
 
-	dbConn, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local", config.DBInfo.User, config.DBInfo.Pwd, config.DBInfo.Addr, config.DBInfo.DBName))
+	//db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local", config.DBInfo.User, config.DBInfo.Pwd, config.DBInfo.Addr, config.DBInfo.DBName))
+	db, err = gorm.Open("sqlite3", "sqlite.db")
 	if err != nil {
 		fmt.Println(fmt.Sprintf("%s:%s@%s/%s?charset=utf8&parseTime=True&loc=Local", config.DBInfo.User, config.DBInfo.Pwd, config.DBInfo.Addr, config.DBInfo.DBName))
 		panic("failed to connect mysql:" + err.Error())
 	}
 
-	if !dbConn.HasTable(CollectForm{}) {
-		d := dbConn.CreateTable(CollectForm{})
+	if !db.HasTable(Submission{}) {
+		d := db.CreateTable(Submission{})
 		if d.Error != nil {
-			panic("crate table failed:" + d.Error.Error())
+			panic("create table failed:" + d.Error.Error())
 		}
 	}
 
@@ -84,7 +87,7 @@ func main() {
 	// 返回住宿信息列表
 	e.GET("/accommodations", func(c echo.Context) error {
 		fileId := "6c6GKvX83hRCVdG8"
-		opt := shimo_openapi.Opts{"工作表1", 278, "P", "（", time.Minute * 5}
+		opt := shimo_openapi.Opts{"工作表1", 278, "R", "（", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -129,28 +132,47 @@ func main() {
 		return c.JSONBlob(http.StatusOK, message)
 	})
 
-	e.POST("/report", func(c echo.Context) error {
-		var request ReportRequest
+	e.GET("/hospital/supplies/submissions", func(c echo.Context) error {
+		var request GetSubmissionsRequest
+		var submissions []Submission
+
 		if c.Bind(&request) != nil && c.Validate(&request) != nil {
+			fmt.Println(c.Validate(&request))
 			return echo.NewHTTPError(http.StatusBadRequest, "bad request")
 		}
-		Log.Printf("[report] new report record: %v", spew.Sdump(request))
-		return c.NoContent(http.StatusNoContent)
+
+		paginator := pagination.Paging(&pagination.Param{
+			DB:      db,
+			Page:    request.Page,
+			Limit:   request.Limit,
+			OrderBy: []string{"id desc"},
+		}, &submissions)
+
+		return c.JSON(http.StatusOK, paginator)
 	})
 
-	e.POST("/collect/form", func(c echo.Context) error {
-		var request CollectForm
+	e.POST("/hospital/supplies/submissions", func(c echo.Context) error {
+		var request Submission
 		if c.Bind(&request) != nil && c.Validate(&request) != nil {
 			// fmt.Println(c.Bind(request))
 			fmt.Println(c.Validate(&request))
 			return echo.NewHTTPError(http.StatusBadRequest, "bad reqeust")
 		}
 
-		d := dbConn.Create(&request)
+		d := db.Create(&request)
 		if d.Error != nil {
 			Log.Printf("create collect_form failed:%v", d.Error)
 			return echo.NewHTTPError(http.StatusInternalServerError)
 		}
+		return c.NoContent(http.StatusNoContent)
+	})
+
+	e.POST("/report", func(c echo.Context) error {
+		var request ReportRequest
+		if c.Bind(&request) != nil && c.Validate(&request) != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "bad request")
+		}
+		Log.Printf("[report] new report record: %v", spew.Sdump(request))
 		return c.NoContent(http.StatusNoContent)
 	})
 
