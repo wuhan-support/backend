@@ -79,8 +79,10 @@ func main() {
 	shimoC := shimo_openapi.NewClient(config.Shimoauth.ClientId, config.Shimoauth.ClientSecret, config.Shimoauth.Username, config.Shimoauth.Password, config.Shimoauth.Scope)
 	Log.Println(config, shimoC)
 
+	api := e.Group("/api")
+
 	// 返回住宿信息列表
-	e.GET("/accommodations", func(c echo.Context) error {
+	api.GET("/accommodations", func(c echo.Context) error {
 		fileId := "6c6GKvX83hRCVdG8"
 		opt := shimo_openapi.Opts{"工作表1", 278, "R", "（", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
@@ -92,7 +94,7 @@ func main() {
 	})
 
 	// 返回心理咨询机构列表
-	e.GET("/platforms/psychological", func(c echo.Context) error {
+	api.GET("/platforms/psychological", func(c echo.Context) error {
 		fileId := "Dpy6Q668cj3Xx8Rq"
 		opt := shimo_openapi.Opts{"工作表1", 17, "O", "\n", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
@@ -104,7 +106,7 @@ func main() {
 	})
 
 	// 返回线上医疗平台列表
-	e.GET("/platforms/medical", func(c echo.Context) error {
+	api.GET("/platforms/medical", func(c echo.Context) error {
 		fileId := "kDQJ6vWgWWwq8r8H"
 		opt := shimo_openapi.Opts{"工作表1", 23, "O", " (", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
@@ -116,7 +118,7 @@ func main() {
 	})
 
 	// 返回医院需求列表
-	e.GET("/hospital/supplies", func(c echo.Context) error {
+	api.GET("/hospital/supplies", func(c echo.Context) error {
 		fileId := "zN32MwmPjmCLF0Av"
 		opt := shimo_openapi.Opts{"已合成", 160, "AP", " ", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
@@ -127,7 +129,7 @@ func main() {
 		return c.JSONBlob(http.StatusOK, message)
 	})
 
-	//e.GET("/hospital/supplies/submissions", func(c echo.Context) error {
+	//api.GET("/hospital/supplies/submissions", func(c echo.Context) error {
 	//	var request GetSubmissionsRequest
 	//	var submissions []Submission
 	//
@@ -146,7 +148,7 @@ func main() {
 	//	return c.JSON(http.StatusOK, paginator)
 	//})
 	//
-	//e.POST("/hospital/supplies/submissions", func(c echo.Context) error {
+	//api.POST("/hospital/supplies/submissions", func(c echo.Context) error {
 	//	var request Submission
 	//	if c.Bind(&request) != nil && c.Validate(&request) != nil {
 	//		// fmt.Println(c.Bind(request))
@@ -162,7 +164,7 @@ func main() {
 	//	return c.NoContent(http.StatusNoContent)
 	//})
 
-	e.POST("/report", func(c echo.Context) error {
+	api.POST("/report", func(c echo.Context) error {
 		var request ReportRequest
 		if c.Bind(&request) != nil && c.Validate(&request) != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, "bad request")
@@ -171,7 +173,7 @@ func main() {
 		return c.NoContent(http.StatusNoContent)
 	})
 
-	//e.POST("/upload", func(c echo.Context) error {
+	//api.POST("/upload", func(c echo.Context) error {
 	//	fn, err := c.FormFile("file")
 	//	if err != nil {
 	//		return echo.NewHTTPError(http.StatusBadRequest, "file name not found")
