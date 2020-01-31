@@ -9,3 +9,5 @@
 - `GET /accommodations` 返回 JSON 形式的住宿信息列表
 - `GET /platforms/psychological` 返回 JSON 形式的心理咨询机构列表
 - `GET /platforms/medical` 返回 JSON 形式的线上医疗平台列表
+- `POST /collect/form` 创建数据到mysql
+- `POST /upload` 上传文件
