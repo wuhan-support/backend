@@ -10,6 +10,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 RUN apk add git
 
+RUN go env -w GOPROXY=https://goproxy.cn,direct
+
 COPY config.example.yml config.yml
 
 ENTRYPOINT go run .
