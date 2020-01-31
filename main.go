@@ -1,16 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"github.com/biezhi/gorm-paginator/pagination"
-	"io"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
-	"github.com/champly/lib4go/tool"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/jinzhu/configor"
 	"github.com/jinzhu/gorm"
@@ -45,26 +40,26 @@ func init() {
 	}
 
 	//db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local", config.DBInfo.User, config.DBInfo.Pwd, config.DBInfo.Addr, config.DBInfo.DBName))
-	db, err = gorm.Open("sqlite3", "sqlite.db")
-	if err != nil {
-		fmt.Println(fmt.Sprintf("%s:%s@%s/%s?charset=utf8&parseTime=True&loc=Local", config.DBInfo.User, config.DBInfo.Pwd, config.DBInfo.Addr, config.DBInfo.DBName))
-		panic("failed to connect mysql:" + err.Error())
-	}
+	//db, err = gorm.Open("sqlite3", "sqlite.db")
+	//if err != nil {
+	//	fmt.Println(fmt.Sprintf("%s:%s@%s/%s?charset=utf8&parseTime=True&loc=Local", config.DBInfo.User, config.DBInfo.Pwd, config.DBInfo.Addr, config.DBInfo.DBName))
+	//	panic("failed to connect mysql:" + err.Error())
+	//}
+	//
+	//if !db.HasTable(Submission{}) {
+	//	d := db.CreateTable(Submission{})
+	//	if d.Error != nil {
+	//		panic("create table failed:" + d.Error.Error())
+	//	}
+	//}
 
-	if !db.HasTable(Submission{}) {
-		d := db.CreateTable(Submission{})
-		if d.Error != nil {
-			panic("create table failed:" + d.Error.Error())
-		}
-	}
-
-	_, err = os.Stat(config.UploadPath)
-	if os.IsNotExist(err) {
-		err = os.MkdirAll(config.UploadPath, os.ModePerm)
-		if err != nil {
-			panic("failed create upload path:" + err.Error())
-		}
-	}
+	//_, err = os.Stat(config.UploadPath)
+	//if os.IsNotExist(err) {
+	//	err = os.MkdirAll(config.UploadPath, os.ModePerm)
+	//	if err != nil {
+	//		panic("failed create upload path:" + err.Error())
+	//	}
+	//}
 }
 
 func main() {
@@ -132,40 +127,40 @@ func main() {
 		return c.JSONBlob(http.StatusOK, message)
 	})
 
-	e.GET("/hospital/supplies/submissions", func(c echo.Context) error {
-		var request GetSubmissionsRequest
-		var submissions []Submission
-
-		if c.Bind(&request) != nil && c.Validate(&request) != nil {
-			fmt.Println(c.Validate(&request))
-			return echo.NewHTTPError(http.StatusBadRequest, "bad request")
-		}
-
-		paginator := pagination.Paging(&pagination.Param{
-			DB:      db,
-			Page:    request.Page,
-			Limit:   request.Limit,
-			OrderBy: []string{"id desc"},
-		}, &submissions)
-
-		return c.JSON(http.StatusOK, paginator)
-	})
-
-	e.POST("/hospital/supplies/submissions", func(c echo.Context) error {
-		var request Submission
-		if c.Bind(&request) != nil && c.Validate(&request) != nil {
-			// fmt.Println(c.Bind(request))
-			fmt.Println(c.Validate(&request))
-			return echo.NewHTTPError(http.StatusBadRequest, "bad reqeust")
-		}
-
-		d := db.Create(&request)
-		if d.Error != nil {
-			Log.Printf("create collect_form failed:%v", d.Error)
-			return echo.NewHTTPError(http.StatusInternalServerError)
-		}
-		return c.NoContent(http.StatusNoContent)
-	})
+	//e.GET("/hospital/supplies/submissions", func(c echo.Context) error {
+	//	var request GetSubmissionsRequest
+	//	var submissions []Submission
+	//
+	//	if c.Bind(&request) != nil && c.Validate(&request) != nil {
+	//		fmt.Println(c.Validate(&request))
+	//		return echo.NewHTTPError(http.StatusBadRequest, "bad request")
+	//	}
+	//
+	//	paginator := pagination.Paging(&pagination.Param{
+	//		DB:      db,
+	//		Page:    request.Page,
+	//		Limit:   request.Limit,
+	//		OrderBy: []string{"id desc"},
+	//	}, &submissions)
+	//
+	//	return c.JSON(http.StatusOK, paginator)
+	//})
+	//
+	//e.POST("/hospital/supplies/submissions", func(c echo.Context) error {
+	//	var request Submission
+	//	if c.Bind(&request) != nil && c.Validate(&request) != nil {
+	//		// fmt.Println(c.Bind(request))
+	//		fmt.Println(c.Validate(&request))
+	//		return echo.NewHTTPError(http.StatusBadRequest, "bad reqeust")
+	//	}
+	//
+	//	d := db.Create(&request)
+	//	if d.Error != nil {
+	//		Log.Printf("create collect_form failed:%v", d.Error)
+	//		return echo.NewHTTPError(http.StatusInternalServerError)
+	//	}
+	//	return c.NoContent(http.StatusNoContent)
+	//})
 
 	e.POST("/report", func(c echo.Context) error {
 		var request ReportRequest
@@ -176,36 +171,36 @@ func main() {
 		return c.NoContent(http.StatusNoContent)
 	})
 
-	e.POST("/upload", func(c echo.Context) error {
-		fn, err := c.FormFile("file")
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "file name not found")
-		}
-		fs, err := fn.Open()
-		if err != nil {
-			Log.Printf("open upload file %s failed:%v", fn.Filename, err)
-			return echo.NewHTTPError(http.StatusInternalServerError)
-		}
-
-		suf := ""
-		index := strings.LastIndex(fn.Filename, ".")
-		if index != -1 {
-			suf = fn.Filename[index:]
-		}
-
-		fname := tool.GetGUID() + suf
-		fd, err := os.Create(fmt.Sprintf("%s/%s", config.UploadPath, fname))
-		if err != nil {
-			Log.Printf("create file %s failed:%v", fname, err)
-			return echo.NewHTTPError(http.StatusInternalServerError)
-		}
-		if _, err = io.Copy(fd, fs); err != nil {
-			Log.Printf("copy file failed:%v", err)
-			return echo.NewHTTPError(http.StatusInternalServerError)
-		}
-
-		return c.JSON(http.StatusOK, map[string]string{"fcode": fname})
-	})
+	//e.POST("/upload", func(c echo.Context) error {
+	//	fn, err := c.FormFile("file")
+	//	if err != nil {
+	//		return echo.NewHTTPError(http.StatusBadRequest, "file name not found")
+	//	}
+	//	fs, err := fn.Open()
+	//	if err != nil {
+	//		Log.Printf("open upload file %s failed:%v", fn.Filename, err)
+	//		return echo.NewHTTPError(http.StatusInternalServerError)
+	//	}
+	//
+	//	suf := ""
+	//	index := strings.LastIndex(fn.Filename, ".")
+	//	if index != -1 {
+	//		suf = fn.Filename[index:]
+	//	}
+	//
+	//	fname := tool.GetGUID() + suf
+	//	fd, err := os.Create(fmt.Sprintf("%s/%s", config.UploadPath, fname))
+	//	if err != nil {
+	//		Log.Printf("create file %s failed:%v", fname, err)
+	//		return echo.NewHTTPError(http.StatusInternalServerError)
+	//	}
+	//	if _, err = io.Copy(fd, fs); err != nil {
+	//		Log.Printf("copy file failed:%v", err)
+	//		return echo.NewHTTPError(http.StatusInternalServerError)
+	//	}
+	//
+	//	return c.JSON(http.StatusOK, map[string]string{"fcode": fname})
+	//})
 
 	Log.Fatal(e.Start(config.Server.Address))
 }
