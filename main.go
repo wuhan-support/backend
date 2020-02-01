@@ -10,7 +10,7 @@ import (
 	"github.com/jinzhu/configor"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	//_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/labstack/echo"
 	shimo_openapi "github.com/wuhan-support/shimo-openapi"
 	"gopkg.in/go-playground/validator.v9"
