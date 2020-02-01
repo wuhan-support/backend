@@ -74,6 +74,8 @@ func main() {
 	e.Debug = false
 	e.Validator = &CustomValidator{validator: validator.New()}
 
+	//e.Use(middleware.Logger())
+
 	//e.Use(SimulateDelay)
 
 	shimoC := shimo_openapi.NewClient(config.Shimoauth.ClientId, config.Shimoauth.ClientSecret, config.Shimoauth.Username, config.Shimoauth.Password, config.Shimoauth.Scope)
@@ -96,7 +98,7 @@ func main() {
 	// 返回心理咨询机构列表
 	api.GET("/platforms/psychological", func(c echo.Context) error {
 		fileId := "Dpy6Q668cj3Xx8Rq"
-		opt := shimo_openapi.Opts{"工作表1", 17, "O", "\n", time.Minute * 5}
+		opt := shimo_openapi.Opts{"上线版本", 19, "M", "\n", time.Minute * 30}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -108,7 +110,7 @@ func main() {
 	// 返回线上医疗平台列表
 	api.GET("/platforms/medical", func(c echo.Context) error {
 		fileId := "kDQJ6vWgWWwq8r8H"
-		opt := shimo_openapi.Opts{"工作表1", 23, "O", " (", time.Minute * 5}
+		opt := shimo_openapi.Opts{"上线版本", 30, "D", " (", time.Minute * 30}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -120,7 +122,7 @@ func main() {
 	// 返回医院需求列表
 	api.GET("/hospital/supplies", func(c echo.Context) error {
 		fileId := "zN32MwmPjmCLF0Av"
-		opt := shimo_openapi.Opts{"已合成", 160, "AP", " ", time.Minute * 5}
+		opt := shimo_openapi.Opts{"已合成", 160, "AP", " ", time.Minute * 3}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
