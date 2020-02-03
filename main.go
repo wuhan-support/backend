@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/labstack/echo/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -71,10 +72,9 @@ func main() {
 	Log = log.New(logFile, "[http] ", log.LstdFlags)
 
 	e := echo.New()
-	e.Debug = false
-	e.Validator = &CustomValidator{validator: validator.New()}
+	e.Use(middleware.Gzip())
 
-	//e.Use(middleware.Logger())
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	//e.Use(SimulateDelay)
 
@@ -107,8 +107,8 @@ func main() {
 
 	// 返回线上医疗平台列表
 	e.GET("/platforms/medical", func(c echo.Context) error {
-		fileId := "kDQJ6vWgWWwq8r8H"
-		opt := shimo_openapi.Opts{"上线版本", 30, "D", " (", time.Minute * 30}
+		fileId := "DqpyXVgXCwdvqrht"
+		opt := shimo_openapi.Opts{"总表", 263, "BR", "", time.Minute * 30}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -120,7 +120,44 @@ func main() {
 	// 返回医院需求列表
 	e.GET("/hospital/supplies", func(c echo.Context) error {
 		fileId := "zN32MwmPjmCLF0Av"
-		opt := shimo_openapi.Opts{"已合成", 160, "AP", " ", time.Minute * 3}
+		opt := shimo_openapi.Opts{"已合成", 426, "AP", " ", time.Minute * 5}
+		message, err := shimoC.GetFileWithOpts(fileId, opt)
+		if err != nil {
+			Log.Printf("failed to get document: %v", err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
+		}
+		return c.JSONBlob(http.StatusOK, message)
+	})
+
+	// 返回第二版的医院需求列表
+	e.GET("/hospital/supplies/v2", func(c echo.Context) error {
+		fileId := "DqpyXVgXCwdvqrht"
+		opt := shimo_openapi.Opts{"总表", 300, "BR", "----", time.Minute * 30}
+		message, err := shimoC.GetFileWithOpts(fileId, opt)
+		if err != nil {
+			Log.Printf("failed to get document: %v", err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
+		}
+		return c.JSONBlob(http.StatusOK, message)
+	})
+
+
+	// 返回武汉在外人员住宿信息
+	e.GET("/people/accommodations", func(c echo.Context) error {
+		fileId := "DR3OV8MN9yUxFnAB"
+		opt := shimo_openapi.Opts{"工作表1", 934, "L", " ", time.Hour * 1}
+		message, err := shimoC.GetFileWithOpts(fileId, opt)
+		if err != nil {
+			Log.Printf("failed to get document: %v", err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
+		}
+		return c.JSONBlob(http.StatusOK, message)
+	})
+
+	// 返回零散信息
+	e.GET("/wiki/stream", func(c echo.Context) error {
+		fileId := "XRkgJOMRW0CrFbqM"
+		opt := shimo_openapi.Opts{"实时", 100, "H", " ", time.Minute * 3}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
