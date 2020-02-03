@@ -107,8 +107,8 @@ func main() {
 
 	// 返回线上医疗平台列表
 	e.GET("/platforms/medical", func(c echo.Context) error {
-		fileId := "DqpyXVgXCwdvqrht"
-		opt := shimo_openapi.Opts{"总表", 263, "BR", "", time.Minute * 30}
+		fileId := "kDQJ6vWgWWwq8r8H"
+		opt := shimo_openapi.Opts{"上线版本", 30, "D", " (", time.Minute * 30}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
