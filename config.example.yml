@@ -17,3 +17,7 @@ dbinfo:
   pwd: "123456"
 
 uploadPath: "./upload"
+
+telegram:
+  botToken: "x:x"
+  chatId: 0

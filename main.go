@@ -15,12 +15,15 @@ import (
 	"github.com/labstack/echo"
 	shimo_openapi "github.com/wuhan-support/shimo-openapi"
 	"gopkg.in/go-playground/validator.v9"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 var (
 	config Config
 	Log    *log.Logger
 	db     *gorm.DB
+	tgbot    *tgbotapi.BotAPI
 )
 
 func (cv *CustomValidator) Validate(i interface{}) error {
@@ -80,6 +83,11 @@ func main() {
 
 	shimoC := shimo_openapi.NewClient(config.Shimoauth.ClientId, config.Shimoauth.ClientSecret, config.Shimoauth.Username, config.Shimoauth.Password, config.Shimoauth.Scope)
 	Log.Println(config, shimoC)
+
+	tgbot, err = tgbotapi.NewBotAPI(config.Telegram.BotToken)
+	if err != nil {
+		Log.Printf("failed to initialize telegram bot: %v", err)
+	}
 
 	// 返回住宿信息列表
 	e.GET("/accommodations", func(c echo.Context) error {
@@ -157,7 +165,7 @@ func main() {
 	// 返回零散信息
 	e.GET("/wiki/stream", func(c echo.Context) error {
 		fileId := "XRkgJOMRW0CrFbqM"
-		opt := shimo_openapi.Opts{"实时", 100, "H", " ", time.Minute * 3}
+		opt := shimo_openapi.Opts{"实时", 100, "H", " ", time.Minute * 30}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -207,6 +215,9 @@ func main() {
 			return echo.NewHTTPError(http.StatusBadRequest, "bad request")
 		}
 		Log.Printf("[report] new report record: %v", spew.Sdump(request))
+		go func() {
+			_ = notifyAdmins(spew.Sdump(request))
+		}()
 		return c.NoContent(http.StatusNoContent)
 	})
 

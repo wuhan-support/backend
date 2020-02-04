@@ -10,7 +10,7 @@ type Config struct {
 		Username     string `yaml:"username"`
 		Password     string `yaml:"password"`
 		Scope        string `yaml:"scope"`
-	}
+	} `yaml:"shimoauth"`
 	DBInfo struct {
 		DBName string `yaml:"dbname"`
 		Addr   string `yaml:"addr"`
@@ -18,4 +18,8 @@ type Config struct {
 		Pwd    string `yaml:"pwd"`
 	} `yaml:"dbinfo"`
 	UploadPath string `yaml:"uploadPath"`
+	Telegram struct {
+		BotToken string `yaml:"botToken"`
+		ChatID int64 `yaml:"chatId"`
+	} `yaml:"telegram"`
 }
