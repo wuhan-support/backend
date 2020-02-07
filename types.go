@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/jinzhu/gorm"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -20,24 +19,24 @@ type CustomValidator struct {
 }
 
 type SubmissionSupply struct {
-	gorm.Model
+	//gorm.Model
 	Name string `json:"name,omitempty" gorm:"" validate:"required"`
-	Need uint `json:"need,omitempty" gorm:"" validate:"required"`
-	Daily uint `json:"daily,omitempty" gorm:"" validate:"required"`
-	Have uint `json:"have,omitempty" gorm:"" validate:"required"`
+	Need string `json:"need,omitempty" gorm:"" validate:"required"`
+	Daily string `json:"daily,omitempty" gorm:"" validate:"required"`
+	Have string `json:"have,omitempty" gorm:"" validate:"required"`
 	Requirements string `json:"requirements,omitempty" gorm:"" validate:"required"`
 }
 
 type Submission struct {
 	//ID              int    `json:"id" gorm:"primary_key;not null;auto_increment"`
-	gorm.Model
+	//gorm.Model
 	Name            string             `json:"name,omitempty" gorm:"" validate:"required,max=100"`
 	Province        string             `json:"province,omitempty" gorm:"" validate:"required"`
 	City            string             `json:"city,omitempty" gorm:"" validate:"required"`
 	Suburb          string             `json:"suburb,omitempty" gorm:"" validate:"required"`
 	Address         string             `json:"address,omitempty" gorm:"" validate:"required"`
-	Patients        int                `json:"patients,omitempty" gorm:"" validate:""`
-	Beds            int                `json:"beds,omitempty" gorm:"" validate:""`
+	Patients        string                `json:"patients,omitempty" gorm:"" validate:""`
+	Beds            string                `json:"beds,omitempty" gorm:"" validate:""`
 	ContactName     string             `json:"contactName,omitempty" gorm:"" validate:""`
 	ContactOrg      string             `json:"contactOrg,omitempty" gorm:"" validate:"required"`
 	ContactPhone    string             `json:"contactPhone,omitempty" gorm:"" validate:"required"`

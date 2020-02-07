@@ -22,4 +22,9 @@ type Config struct {
 		BotToken string `yaml:"botToken"`
 		ChatID int64 `yaml:"chatId"`
 	} `yaml:"telegram"`
+	Aliyun struct {
+		Endpoint string `yaml:"endpoint"`
+		AccessKeyID string `yaml:"accessKeyId"`
+		AccessKeySecret string `yaml:"accessKeySecret"`
+	} `yaml:"aliyun"`
 }

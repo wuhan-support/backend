@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/labstack/echo/middleware"
 	"log"
 	"net/http"
 	"os"
+	"text/template"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -76,6 +79,7 @@ func main() {
 
 	e := echo.New()
 	e.Use(middleware.Gzip())
+	e.Use(middleware.Logger())
 
 	e.Validator = &CustomValidator{validator: validator.New()}
 
@@ -192,22 +196,56 @@ func main() {
 	//
 	//	return c.JSON(http.StatusOK, paginator)
 	//})
-	//
-	//e.POST("/hospital/supplies/submissions", func(c echo.Context) error {
-	//	var request Submission
-	//	if c.Bind(&request) != nil && c.Validate(&request) != nil {
-	//		// fmt.Println(c.Bind(request))
-	//		fmt.Println(c.Validate(&request))
-	//		return echo.NewHTTPError(http.StatusBadRequest, "bad reqeust")
-	//	}
-	//
-	//	d := db.Create(&request)
-	//	if d.Error != nil {
-	//		Log.Printf("create collect_form failed:%v", d.Error)
-	//		return echo.NewHTTPError(http.StatusInternalServerError)
-	//	}
-	//	return c.NoContent(http.StatusNoContent)
-	//})
+
+	e.POST("/hospital/supplies/submissions", func(c echo.Context) error {
+		var request Submission
+		if c.Bind(&request) != nil && c.Validate(&request) != nil {
+			// fmt.Println(c.Bind(request))
+			fmt.Println(c.Validate(&request))
+			return echo.NewHTTPError(http.StatusBadRequest, "bad request")
+		}
+
+		tmpl := template.Must(template.New("suppliesSubmission").Parse(`*新的物资需求提交*
+
+- 医院名称：{{.Name}}
+- 医院所在地区：{{.Province}} {{.City}} {{.Suburb}}
+- 医院详细地址：{{.Address}}
+- 医院现每天接待患者数量：{{.Patients}}
+- 医院床位数：{{.Beds}}
+- 责任人姓名：{{.ContactName}}
+- 责任人所在单位或组织：{{.ContactOrg}}
+- 责任人联系方式：{{.ContactPhone}}
+- 物资需求列表：{{range .Supplies}}
+	- 物资名称：{{.Name}}
+	  需求数量：{{.Need}}
+	  每日消耗：{{.Daily}}
+	  现在库存：{{.Have}}
+	  供应要求：{{.Requirements}}
+{{end}}
+- 可接受的捐物资渠道：{{.Pathways}}
+- 现在的物流状况：{{.LogisticStatus}}
+- 需求信息数据来源：{{.Source}}
+- 需求的官方证明：{{.Proof}}
+- 其他备注：{{.Notes}}`))
+
+		buf := bytes.NewBufferString("")
+		err = tmpl.Execute(buf, request)
+		if err != nil {
+			Log.Printf("failed to execute template. invalid data? %v", err)
+			return echo.NewHTTPError(http.StatusBadRequest, "failed to execute template. invalid data?")
+		}
+
+		go func() {
+			Log.Print(notifyAdmins(buf.String()))
+		}()
+
+		//d := db.Create(&request)
+		//if d.Error != nil {
+		//	Log.Printf("create collect_form failed:%v", d.Error)
+		//	return echo.NewHTTPError(http.StatusInternalServerError)
+		//}
+		return c.NoContent(http.StatusNoContent)
+	})
 
 	e.POST("/report", func(c echo.Context) error {
 		var request ReportRequest
@@ -215,8 +253,22 @@ func main() {
 			return echo.NewHTTPError(http.StatusBadRequest, "bad request")
 		}
 		Log.Printf("[report] new report record: %v", spew.Sdump(request))
+
+		tmpl := template.Must(template.New("suppliesSubmission").Parse(`*新的网站信息纠错请求*
+
+- 来源页面名称：{{.Type}}
+- 信息纠错请求原因：{{.Cause}}
+- 信息原数据：{{.Content}}`))
+
+		buf := bytes.NewBufferString("")
+		err = tmpl.Execute(buf, request)
+		if err != nil {
+			Log.Printf("failed to execute template. invalid data? %v", err)
+			return echo.NewHTTPError(http.StatusBadRequest, "failed to execute template. invalid data?")
+		}
+
 		go func() {
-			_ = notifyAdmins(spew.Sdump(request))
+			_ = notifyAdmins(buf.String())
 		}()
 		return c.NoContent(http.StatusNoContent)
 	})

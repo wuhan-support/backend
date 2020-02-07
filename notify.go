@@ -6,7 +6,7 @@ import (
 )
 
 func notifyAdmins(message string) error {
-	m := tgbotapi.NewMessage(config.Telegram.ChatID, fmt.Sprintf("```%s```", message))
+	m := tgbotapi.NewMessage(config.Telegram.ChatID, message)
 	m.ParseMode = tgbotapi.ModeMarkdown
 	if tgbot == nil {
 		return fmt.Errorf("tgbot is not initialized %v", tgbot)
