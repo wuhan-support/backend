@@ -217,10 +217,11 @@ func main() {
 - 责任人联系方式：{{.ContactPhone}}
 - 物资需求列表：{{range .Supplies}}
 	- 物资名称：{{.Name}}
+	  数量单位：{{.Unit}}
 	  需求数量：{{.Need}}
 	  每日消耗：{{.Daily}}
-	  现在库存：{{.Have}}
-	  供应要求：{{.Requirements}}
+	  库存数量：{{.Have}}
+	  物资要求：{{.Requirements}}
 {{end}}
 - 可接受的捐物资渠道：{{.Pathways}}
 - 现在的物流状况：{{.LogisticStatus}}

@@ -21,6 +21,7 @@ type CustomValidator struct {
 type SubmissionSupply struct {
 	//gorm.Model
 	Name string `json:"name,omitempty" gorm:"" validate:"required"`
+	Unit string `json:"unit,omitempty" gorm:"" validate:"required"`
 	Need string `json:"need,omitempty" gorm:"" validate:"required"`
 	Daily string `json:"daily,omitempty" gorm:"" validate:"required"`
 	Have string `json:"have,omitempty" gorm:"" validate:"required"`
