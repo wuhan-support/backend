@@ -26,7 +26,7 @@ var (
 	config Config
 	Log    *log.Logger
 	db     *gorm.DB
-	tgbot    *tgbotapi.BotAPI
+	tgbot  *tgbotapi.BotAPI
 )
 
 func (cv *CustomValidator) Validate(i interface{}) error {
@@ -245,6 +245,23 @@ func main() {
 		//	Log.Printf("create collect_form failed:%v", d.Error)
 		//	return echo.NewHTTPError(http.StatusInternalServerError)
 		//}
+		return c.NoContent(http.StatusNoContent)
+	})
+	// curl -X POST 'http://localhost:3166/community/supplies/submissions' -H "Content-Type: application/json" -d '{"name":"xyz","age":11, "medicalSupplies": [{"name":"口罩", "[unit":"个", "need": "10", "daily":"1", "have": "0", "requirement": "急需!"}], "province": "湖北", "city": "武汉", "suburb": "汉口", "address": "xx花园"}'
+	e.POST("/community/supplies/submissions", func(c echo.Context) error {
+		var request CommunitySubmission
+		if c.Bind(&request) != nil && c.Validate(&request) != nil {
+			// fmt.Println(c.Bind(request))
+			fmt.Println(c.Validate(&request))
+			return echo.NewHTTPError(http.StatusBadRequest, "bad request")
+		}
+		fileId := "qrpCHCDY8t6wccpD"
+		w := shimo_openapi.NewWriteOpts("main", &request)
+		err := shimoC.AppendFileFromAPI(fileId, *w)
+		if err != nil {
+			Log.Printf("[CommunitySubmission] failed, err: %v\n", err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "append file failed")
+		}
 		return c.NoContent(http.StatusNoContent)
 	})
 
