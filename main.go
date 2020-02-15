@@ -153,6 +153,21 @@ func main() {
 		return c.JSONBlob(http.StatusOK, message)
 	})
 
+	// 返回社区物资需求列表
+	e.GET("/community/supplies", func(c echo.Context) error {
+		fileId := "qrpCHCDY8t6wccpD"
+		opt := shimo_openapi.Opts{"main", 100, "M", " ", time.Minute * 5}
+		message, err := shimoC.GetFileWithOpts(fileId, opt)
+		if err != nil {
+			Log.Printf("failed to get document: %v", err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get document")
+		}
+		refactMessage, err := RefactCommunitySubmissionFromShimoDoc(message)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to refact")
+		}
+		return c.JSONBlob(http.StatusOK, refactMessage)
+	})
 
 	// 返回武汉在外人员住宿信息
 	e.GET("/people/accommodations", func(c echo.Context) error {

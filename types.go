@@ -1,9 +1,18 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"reflect"
 	"strings"
 
 	"gopkg.in/go-playground/validator.v9"
+)
+
+const (
+	DotSeparator      = "、"
+	ColonSeparator    = ":"
+	OrSymbolSeparator = "|"
 )
 
 type GeneralResponse struct {
@@ -48,6 +57,32 @@ func (s *SubmissionSupply) HumanString() string {
 	return sb.String()
 }
 
+func NewSubmissionSupplyFromShimoDoc(doc string) *SubmissionSupply {
+	submissionSupply := &SubmissionSupply{}
+	columns := strings.Split(doc, OrSymbolSeparator)
+	if len(columns) != reflect.TypeOf(submissionSupply).Elem().NumField()-1 {
+		fmt.Printf("%d, %d, %+v\n", len(columns), reflect.TypeOf(submissionSupply).Elem().NumField(), columns)
+		return nil
+	}
+	submissionSupply.Name = columns[0]
+	submissionSupply.Need, submissionSupply.Unit, _ = ParseSubmissionSupplyHumanString(columns[1])
+	submissionSupply.Daily, _, _ = ParseSubmissionSupplyHumanString(columns[2])
+	submissionSupply.Have, _, _ = ParseSubmissionSupplyHumanString(columns[3])
+	_, _, submissionSupply.Requirements = ParseSubmissionSupplyHumanString(columns[4])
+
+	return submissionSupply
+}
+
+func ParseSubmissionSupplyHumanString(humanString string) (string, string, string) {
+	fields := strings.Split(humanString, ColonSeparator)
+	if len(fields) != 2 {
+		return "", "", ""
+	}
+	part := fields[1]
+	length := len(part)
+	return part[:length-3], part[length-3:], part
+}
+
 type Submission struct {
 	//ID              int    `json:"id" gorm:"primary_key;not null;auto_increment"`
 	//gorm.Model
@@ -86,6 +121,42 @@ type CommunitySubmission struct {
 	Notes             string              `json:"notes,omitempty" gorm:"type:text" validate:"omitempty"`
 }
 
+func RefactCommunitySubmissionFromShimoDoc(doc []byte) ([]byte, error) {
+	slice := make([]map[string]interface{}, 0)
+	err := json.Unmarshal(doc, &slice)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	for _, m := range slice {
+		if ms, exists := m["medicalsupplies"]; exists {
+			if ms != nil && ms != "" {
+				m["medicalsupplies"] = RefactSubmissionSupply(ms.(string))
+			}
+		}
+		if ms, exists := m["livesupplies"]; exists {
+			if ms != nil && ms != "" {
+				m["livesupplies"] = RefactSubmissionSupply(ms.(string))
+			}
+		}
+	}
+
+	return json.Marshal(slice)
+}
+
+func RefactSubmissionSupply(humanString string) []*SubmissionSupply {
+	supplySlice := make([]*SubmissionSupply, 0)
+	elements := strings.Split(humanString, DotSeparator)
+	for _, e := range elements {
+		submissionSupply := NewSubmissionSupplyFromShimoDoc(e)
+		if submissionSupply != nil {
+			supplySlice = append(supplySlice, submissionSupply)
+		}
+	}
+	return supplySlice
+}
+
 func (c *CommunitySubmission) Values() []interface{} {
 	r := []interface{}{
 		c.Name,
@@ -110,7 +181,7 @@ func JoinSubmissionSupplySlice(supplySlice []*SubmissionSupply) string {
 	for _, s := range supplySlice {
 		r = append(r, s.HumanString())
 	}
-	return strings.Join(r, "、")
+	return strings.Join(r, DotSeparator)
 }
 
 type GetSubmissionsRequest struct {
