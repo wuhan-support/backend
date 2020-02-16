@@ -80,7 +80,11 @@ func ParseSubmissionSupplyHumanString(humanString string) (string, string, strin
 	}
 	part := fields[1]
 	length := len(part)
-	return part[:length-3], part[length-3:], part
+	if length < 3 {
+		return part, part, part
+	} else {
+		return part[:length-3], part[length-3:], part
+	}
 }
 
 type Submission struct {
