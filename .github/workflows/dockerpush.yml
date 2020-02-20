@@ -68,7 +68,7 @@ jobs:
           [ "$VERSION" == "master" ] && VERSION=latest-${{ github.sha }}
 
           # Use Docker `dev` tag convention for dev branch
-          [ "$VERSION" == "dev" ] && VERSION=dev-${{ github.sha }}
+          [ "$VERSION" == "dev" ] && VERSION=dev
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
