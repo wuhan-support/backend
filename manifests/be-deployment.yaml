@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.20.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: be
+    release : stable
+  name: wuhan-support-be
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.20.0 ()
+      creationTimestamp: null
+      labels:
+        io.kompose.service: be
+    spec:
+      containers:
+      - image: docker.pkg.github.com/wuhan-support/backend/backend:latest
+        imagePullPolicy: Always
+        name: wuhan-support-be
+        ports:
+        - containerPort: 80
+        resources: {}
+        volumeMounts:
+        - mountPath: /go/src/config.yml
+          subPath: config.yml
+          name: config
+          readOnly: true
+      imagePullSecrets:
+      - name: regsecret
+      restartPolicy: Always
+      volumes:
+      - name: config
+        secret:
+          secretName: be-config
+status: {}
