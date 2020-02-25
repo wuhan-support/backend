@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/labstack/echo/middleware"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -75,7 +76,9 @@ func main() {
 		panic(err)
 	}
 
-	Log = log.New(logFile, "[http] ", log.LstdFlags)
+	w := io.MultiWriter(logFile, os.Stdout)
+
+	Log = log.New(w, "[http] ", log.LstdFlags)
 
 	e := echo.New()
 	e.Use(middleware.Gzip())
