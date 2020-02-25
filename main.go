@@ -82,7 +82,7 @@ func main() {
 
 	e := echo.New()
 	e.Use(middleware.Gzip())
-	e.Use(middleware.Logger())
+	//e.Use(middleware.Logger())
 
 	e.Validator = &CustomValidator{validator: validator.New()}
 
