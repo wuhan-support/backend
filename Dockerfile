@@ -14,4 +14,6 @@ RUN go env -w GOPROXY=https://goproxy.cn,direct
 
 COPY config.example.yml config.yml
 
+RUN go get ./...
+
 ENTRYPOINT go run .
