@@ -76,7 +76,7 @@ func main() {
 		panic(err)
 	}
 
-	w := io.MultiWriter(logFile, os.Stdout)
+	w := io.MultiWriter(os.Stdout, os.Stderr, logFile)
 
 	Log = log.New(w, "[http] ", log.LstdFlags)
 
