@@ -76,13 +76,13 @@ func main() {
 		panic(err)
 	}
 
-	w := io.MultiWriter(logFile, os.Stdout)
+	w := io.MultiWriter(os.Stdout, os.Stderr, logFile)
 
 	Log = log.New(w, "[http] ", log.LstdFlags)
 
 	e := echo.New()
 	e.Use(middleware.Gzip())
-	e.Use(middleware.Logger())
+	//e.Use(middleware.Logger())
 
 	e.Validator = &CustomValidator{validator: validator.New()}
 
