@@ -3,7 +3,7 @@ module backend
 go 1.13
 
 require (
-	github.com/aliyun/aliyun-oss-go-sdk v2.0.5+incompatible
+	github.com/aliyun/aliyun-oss-go-sdk v2.0.5+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
@@ -19,7 +19,7 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	github.com/valyala/fasttemplate v1.1.0 // indirect
-	github.com/wuhan-support/shimo-openapi v0.0.0-20200130045624-64e1a9572f2f
+	github.com/wuhan-support/shimo-openapi v0.0.0-20200225002748-3bd957c1837c
 	golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d // indirect
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
 	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
