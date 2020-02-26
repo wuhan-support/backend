@@ -99,7 +99,7 @@ func main() {
 	// 返回住宿信息列表
 	e.GET("/accommodations", func(c echo.Context) error {
 		fileId := "6c6GKvX83hRCVdG8"
-		opt := shimo_openapi.Opts{"工作表1", 278, "R", "（", time.Minute * 5}
+		opt := shimo_openapi.Opts{"main", 278, "R", "（", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -111,7 +111,7 @@ func main() {
 	// 返回心理咨询机构列表
 	e.GET("/platforms/psychological", func(c echo.Context) error {
 		fileId := "Dpy6Q668cj3Xx8Rq"
-		opt := shimo_openapi.Opts{"上线版本", 19, "M", "\n", time.Minute * 30}
+		opt := shimo_openapi.Opts{"main", 19, "M", "\n", time.Minute * 30}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -123,7 +123,7 @@ func main() {
 	// 返回线上医疗平台列表
 	e.GET("/platforms/medical", func(c echo.Context) error {
 		fileId := "kDQJ6vWgWWwq8r8H"
-		opt := shimo_openapi.Opts{"上线版本", 30, "D", " (", time.Minute * 30}
+		opt := shimo_openapi.Opts{"main", 30, "D", " (", time.Minute * 30}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -135,7 +135,7 @@ func main() {
 	// 返回医院需求列表
 	e.GET("/hospital/supplies", func(c echo.Context) error {
 		fileId := "zN32MwmPjmCLF0Av"
-		opt := shimo_openapi.Opts{"已合成", 426, "AP", " ", time.Minute * 5}
+		opt := shimo_openapi.Opts{"main", 426, "AP", " ", time.Minute * 5}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -147,7 +147,7 @@ func main() {
 	// 返回第二版的医院需求列表
 	e.GET("/hospital/supplies/v2", func(c echo.Context) error {
 		fileId := "DqpyXVgXCwdvqrht"
-		opt := shimo_openapi.Opts{"总表", 300, "BR", "----", time.Minute * 30}
+		opt := shimo_openapi.Opts{"main", 300, "BR", "----", time.Minute * 30}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -159,7 +159,7 @@ func main() {
 	// 返回武汉在外人员住宿信息
 	e.GET("/people/accommodations", func(c echo.Context) error {
 		fileId := "DR3OV8MN9yUxFnAB"
-		opt := shimo_openapi.Opts{"工作表1", 934, "L", " ", time.Hour * 1}
+		opt := shimo_openapi.Opts{"main", 934, "L", " ", time.Hour * 1}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)
@@ -168,10 +168,10 @@ func main() {
 		return c.JSONBlob(http.StatusOK, message)
 	})
 
-	// 返回零散信息
+	// 返回信息看板
 	e.GET("/wiki/stream", func(c echo.Context) error {
 		fileId := "XRkgJOMRW0CrFbqM"
-		opt := shimo_openapi.Opts{"实时", 100, "H", " ", time.Minute * 30}
+		opt := shimo_openapi.Opts{"main", 100, "H", " ", time.Minute * 30}
 		message, err := shimoC.GetFileWithOpts(fileId, opt)
 		if err != nil {
 			Log.Printf("failed to get document: %v", err)

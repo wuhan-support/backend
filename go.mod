@@ -17,6 +17,7 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/stretchr/testify v1.4.0
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/wuhan-support/shimo-openapi v0.0.0-20200225002748-3bd957c1837c
